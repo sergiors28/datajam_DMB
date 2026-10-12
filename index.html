@@ -584,6 +584,10 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
   .map-card.ub-open .leaflet-control-zoom{margin-bottom:calc(var(--ub-h,150px) + 12px)!important}
 }
 @media (prefers-reduced-motion:reduce){.ub-btn::after,.ub-pin span::after{animation:none!important}}
+/* Buscador: la lista de resultados sale por debajo del cuadro; con overflow:hidden quedaba recortada y no se veía */
+.leaflet-control-geocoder{overflow:visible!important}
+.leaflet-control-geocoder-alternatives{z-index:1000;max-height:min(46vh,320px);overflow-y:auto}
+.leaflet-control-geocoder-alternatives li a b{font-weight:700}
 </style>
 </head>
 
@@ -810,7 +814,8 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
       <li><b>Obras y sectores catastrales:</b> Base Maestra de Barrios, Dirección de Mejoramiento de Barrios, Caja de la Vivienda Popular.</li>
       <li><b>Inversión:</b> archivo Sectores_contrato.csv, con el valor total de cada contrato por sector.</li>
       <li><b>Población:</b> Censo Nacional de Población y Vivienda 2018 (DANE), por manzana. Para que la página cargue rápido, solo se incluyen las manzanas que están a 350 m o menos de alguna obra: las cifras de cada obra son las mismas que con el censo completo.</li>
-      <li><b>Mapas base:</b> CARTO, OpenStreetMap y Esri.</li>
+      <li><b>Mapas base:</b> Esri (topográfico y satelital).</li>
+      <li><b>Búsqueda:</b> los barrios del mapa se buscan dentro de esta página; las direcciones se consultan en OpenStreetMap (Nominatim) y Esri.</li>
     </ul>
     <h3>Cómo se calcula el impacto</h3>
     <p>Al hacer clic en una obra se dibuja un área de 300 metros a su alrededor. Se buscan las manzanas del censo que tocan esa área y se suman sus habitantes, viviendas y hogares.</p>
@@ -1589,6 +1594,7 @@ function ubQuitarPin() {
 function ubPonerPin(ll, acc) {
   const me = state.me || (state.me = {});
   ubQuitarPin();
+  if (state.geoMarker) { state.map.removeLayer(state.geoMarker); state.geoMarker = null; }
   me.pin = L.marker(ll, {
     pane: 'me', keyboard: false, title: 'Tu ubicación aproximada',
     icon: L.divIcon({ className: 'ub-pin', html: '<span></span>', iconSize: [0, 0] })
@@ -1603,26 +1609,31 @@ function ubCard(kind, o) {
   o = o || {};
   const card = $('#ubCard');
   card.dataset.k = kind;
-  const asunto = encodeURIComponent('Consulta sobre mejoramiento de barrios');
-  const cuerpo = encodeURIComponent(o.mailBody || 'Hola, quiero hacer una consulta sobre mejoramiento de barrios.');
-  const mail = 'mailto:' + CVP.correo + '?subject=' + asunto + '&body=' + cuerpo;
+  const bus = o.modo === 'busqueda';
+  const lugar = o.lugar ? esc(String(o.lugar).split(', ').slice(0, 3).join(', ').slice(0, 70)) : '';
   const cta = txt =>
     '<div class="ub-cta"><p>' + txt + '</p><div class="ub-links">' +
-    '<a class="ub-link" href="' + mail + '">Escribir al correo</a>' +
-    '<a class="ub-link alt" href="' + CVP.portal + '" target="_blank" rel="noopener">Ir al portal</a></div></div>';
+    '<a class="ub-link" href="' + CVP.portal + '" target="_blank" rel="noopener">Ir al portal cvp.gov.co</a></div></div>';
   const pie = '<p class="ub-sub">Resultado orientativo según este mapa; la Caja de la Vivienda Popular confirma tu caso.</p>';
-  const prec = o.acc > 150
-    ? '<p class="ub-sub">Precisión de tu ubicación: ±' + nf0.format(Math.round(o.acc)) + ' m. Cerca del borde de un sector, el resultado puede cambiar.</p>' : '';
+  const prec = bus
+    ? (o.aprox ? '<p class="ub-sub">La ubicación de este resultado es aproximada. Cerca del borde de un sector, el resultado puede cambiar.</p>' : '')
+    : (o.acc > 150 ? '<p class="ub-sub">Precisión de tu ubicación: ±' + nf0.format(Math.round(o.acc)) + ' m. Cerca del borde de un sector, el resultado puede cambiar.</p>' : '');
   const head = (ic, titulo) => '<div class="ub-head"><span class="ub-ic" aria-hidden="true">' + ic + '</span><h3>' + titulo + '</h3></div>';
   let h = '';
   if (kind === 'in') {
-    const p = o.f.properties;
-    h = head('✓', '¡Estás en un sector habilitado!') +
-      '<p>Tu ubicación está dentro del sector <b>«' + esc(p.nom) + '»</b>, habilitado para programas de mejoramiento de barrios de la Caja de la Vivienda Popular.</p>' + prec +
+    const nom = '<b>«' + esc(o.f.properties.nom) + '»</b>';
+    const hab = 'habilitado para programas de mejoramiento de barrios de la Caja de la Vivienda Popular.';
+    const tit = !bus ? '¡Estás en un sector habilitado!' : (o.esSector ? '¡Ese sector está habilitado!' : '¡Ese lugar está en un sector habilitado!');
+    const txt = !bus ? 'Tu ubicación está dentro del sector ' + nom + ', ' + hab
+      : (o.esSector ? 'El sector ' + nom + ' está ' + hab
+        : (lugar ? '<b>' + lugar + '</b> está' : 'El lugar que buscaste está') + ' dentro del sector ' + nom + ', ' + hab);
+    h = head('✓', tit) + '<p>' + txt + '</p>' + prec +
       cta('Si lo deseas, puedes realizar tu solicitud o consulta al correo <b>' + CVP.correo + '</b> o ingresando al portal web <b>cvp.gov.co</b>.') + pie;
   } else if (kind === 'out') {
-    h = head('!', 'Estás fuera de los sectores habilitados') +
-      '<p>Tu ubicación no está dentro de los polígonos habilitados para mejoramiento de barrios de la Caja de la Vivienda Popular.' +
+    const tit = bus ? 'Ese lugar está fuera de los sectores habilitados' : 'Estás fuera de los sectores habilitados';
+    const suj = bus ? (lugar ? '<b>' + lugar + '</b> no está' : 'El lugar que buscaste no está') : 'Tu ubicación no está';
+    h = head('!', tit) +
+      '<p>' + suj + ' dentro de los polígonos habilitados para mejoramiento de barrios de la Caja de la Vivienda Popular.' +
       (o.near ? ' El sector habilitado más cercano es <b>«' + esc(o.near.f.properties.nom) + '»</b>, a ' + ubDist(o.near.d) + '.' : '') + '</p>' + prec +
       cta('Aun así, puedes hacer tu consulta al correo <b>' + CVP.correo + '</b> o ingresando al portal web <b>cvp.gov.co</b>.') + pie;
   } else if (kind === 'far') {
@@ -1644,28 +1655,48 @@ function ubCard(kind, o) {
   requestAnimationFrame(() => $('#panelMap').style.setProperty('--ub-h', card.offsetHeight + 'px'));
 }
 
+/* Desplazamiento del centro del mapa para que la tarjeta no tape el punto. */
+function ubDesp() {
+  const sz = state.map.getSize();
+  return window.matchMedia('(max-width:720px)').matches ? [0, Math.min(120, sz.y * 0.18)] : [Math.min(170, sz.x * 0.22), 0];
+}
+
+function ubSectorPorCod(cod) {
+  const k = String(cod == null ? '' : cod).replace(/^0+/, '');
+  return state.sectoresGJ.features.find(f => String(f.properties.cod).replace(/^0+/, '') === k) || null;
+}
+
+function ubResaltar(f) {
+  const code = f.properties.cod, l = state.sectorLayers.get(code);
+  if (!l) return;
+  l.setStyle({ weight: 4, color: COLORS.work, opacity: 1, fillOpacity: 0.7 });
+  setTimeout(() => { if (state.hoverCode !== code) state.layers.sectores.resetStyle(l); }, 2600);
+}
+
+/* Resultado del buscador: ¿ese lugar está dentro de un sector habilitado? */
+function ubBusqueda(g, loc) {
+  let f = null, esSector = false;
+  if (loc && loc.tipo === 'sector') { f = ubSectorPorCod(loc.cod); esSector = !!f; }
+  else {
+    f = ubSectorDe(g.center.lng, g.center.lat);
+    if (!f && loc && loc.sec) f = ubSectorPorCod(loc.sec);
+  }
+  const base = { modo: 'busqueda', lugar: g.name, aprox: !!(g.properties && g.properties.aprox) };
+  if (f) { ubResaltar(f); ubCard('in', Object.assign({ f: f, esSector: esSector }, base)); }
+  else ubCard('out', Object.assign({ near: ubMasCercano(g.center.lng, g.center.lat) }, base));
+}
+
 function ubProcesar(lat, lng, acc) {
   const map = state.map, ll = L.latLng(lat, lng);
   const lim = map.options.maxBounds ? L.latLngBounds(map.options.maxBounds) : null;
   if (lim && !lim.contains(ll)) { ubQuitarPin(); ubCard('far'); return; }
   ubPonerPin(ll, acc);
   /* El mapa se centra un poco al costado para que la tarjeta no tape el punto de ubicación. */
-  const z = Math.max(map.getZoom(), 16), sz = map.getSize();
-  const movil = window.matchMedia('(max-width:720px)').matches;
-  const desp = movil ? [0, Math.min(120, sz.y * 0.18)] : [Math.min(170, sz.x * 0.22), 0];
-  const centro = map.unproject(map.project(ll, z).add(desp), z);
-  map.flyTo(centro, z, { animate: !reduceMotion, duration: 1.2 });
+  const z = Math.max(map.getZoom(), 16);
+  map.flyTo(map.unproject(map.project(ll, z).add(ubDesp()), z), z, { animate: !reduceMotion, duration: 1.2 });
   const f = ubSectorDe(lng, lat);
-  if (f) {
-    const code = f.properties.cod, l = state.sectorLayers.get(code);
-    if (l) {
-      l.setStyle({ weight: 4, color: COLORS.work, opacity: 1, fillOpacity: 0.7 });
-      setTimeout(() => { if (state.hoverCode !== code) state.layers.sectores.resetStyle(l); }, 2600);
-    }
-    ubCard('in', { f: f, acc: acc, mailBody: 'Hola, quiero hacer una solicitud o consulta sobre mejoramiento de barrios en el sector ' + f.properties.nom + '.' });
-  } else {
-    ubCard('out', { near: ubMasCercano(lng, lat), acc: acc });
-  }
+  if (f) { ubResaltar(f); ubCard('in', { f: f, acc: acc }); }
+  else ubCard('out', { near: ubMasCercano(lng, lat), acc: acc });
 }
 
 function ubicarme() {
@@ -1715,13 +1746,9 @@ function initMapa() {
     map.createPane(p[0]).style.zIndex = String(p[1]);
   });
 
-  const claro = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    subdomains: 'abcd', maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-  }).addTo(map);
   const topo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 19, attribution: 'Tiles &copy; Esri'
-  });
+    maxZoom: 19, maxNativeZoom: 18, attribution: 'Tiles &copy; Esri'
+  }).addTo(map);
   const sat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     maxZoom: 19, attribution: 'Tiles &copy; Esri, Maxar, Earthstar Geographics'
   });
@@ -1751,21 +1778,138 @@ function initMapa() {
   initUbicacion(map);
 }
 
-/* ---------- Buscador de direcciones (leaflet-control-geocoder) ---------- */
+/* ---------- Buscador: barrios del mapa (local) + direcciones de Bogotá (remoto) ---------- */
+const VIAS_CO = {
+  cl: 'Calle', cll: 'Calle', cal: 'Calle', calle: 'Calle',
+  kr: 'Carrera', kra: 'Carrera', cra: 'Carrera', cr: 'Carrera', carr: 'Carrera', carrera: 'Carrera', k: 'Carrera',
+  dg: 'Diagonal', diag: 'Diagonal', diagonal: 'Diagonal',
+  tv: 'Transversal', trans: 'Transversal', transv: 'Transversal', transversal: 'Transversal',
+  av: 'Avenida', avda: 'Avenida', avenida: 'Avenida', ac: 'Avenida Calle', ak: 'Avenida Carrera',
+  cq: 'Circular', circ: 'Circular', circular: 'Circular', aut: 'Autopista', autopista: 'Autopista'
+};
+
+function normTxt(s) {
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/* "cra 7 #45-12", "KR 7 BIS A SUR # 45 B - 12", "Calle 100 No. 15-20" -> forma estándar de Bogotá */
+function normalizarDireccion(q) {
+  let s = String(q || '').replace(/[°º]/g, ' ').replace(/\b(?:no|nro|num)\.?\s*(?=\d)/gi, '# ')
+    .replace(/\s*#\s*/g, ' # ').replace(/\s*-\s*/g, '-').replace(/\s+/g, ' ').trim();
+  const m = s.match(/^([A-Za-zÁÉÍÓÚáéíóúÑñ]+)\.?\s*(.+)$/);
+  if (m && VIAS_CO[normTxt(m[1])]) s = VIAS_CO[normTxt(m[1])] + ' ' + m[2];
+  const esDir = /^(Calle|Carrera|Diagonal|Transversal|Avenida|Circular|Autopista)\s+\S/.test(s) && /\d/.test(s);
+  return { texto: s, esDir: esDir, via: esDir ? s.split(' # ')[0] : '', conNumero: esDir && s.indexOf(' # ') > -1 };
+}
+
+function indiceBusqueda() {
+  if (state.idxBusq) return state.idxBusq;
+  const idx = [], vistos = new Set();
+  const add = (e) => { if (!e.nombre) return; const c = normTxt(e.nombre); if (!c || vistos.has(c)) return; vistos.add(c); e.clave = c; idx.push(e); };
+  state.sectoresGJ.features.forEach(f => add({ tipo: 'sector', nombre: f.properties.nom, cod: f.properties.cod, sub: 'Sector · ' + (f.properties.loc || 'Bogotá') }));
+  state.obrasGJ.features.forEach(f => {
+    const p = f.properties, sub = 'Obra · ' + localidadDe(p);
+    add({ tipo: 'obra', nombre: p.barrio, lat: p.cy, lng: p.cx, sec: p.sec, sub: sub });
+    add({ tipo: 'obra', nombre: p.nom, lat: p.cy, lng: p.cx, sec: p.sec, sub: sub });
+  });
+  return (state.idxBusq = idx);
+}
+
+function resultadoLocal(it) {
+  let center = null, bbox = null;
+  if (it.tipo === 'sector') {
+    const l = state.sectorLayers && state.sectorLayers.get(it.cod);
+    if (l) { bbox = l.getBounds(); center = bbox.getCenter(); }
+  } else {
+    center = L.latLng(it.lat, it.lng); bbox = L.latLngBounds(center, center);
+  }
+  if (!center) return null;
+  return {
+    name: it.nombre, center: center, bbox: bbox, properties: { local: it },
+    html: '<b>' + esc(it.nombre) + '</b> <span style="color:#6B7BA8;font-weight:500">' + esc(it.sub) + '</span>'
+  };
+}
+
+/* Búsqueda instantánea y sin red entre los barrios, sectores y obras del propio mapa. */
+function buscarLocal(q, max) {
+  const toks = normTxt(q).split(' ').filter(Boolean);
+  if (!toks.length || toks.join('').length < 2) return [];
+  const out = [];
+  indiceBusqueda().forEach(it => {
+    if (!toks.every(t => it.clave.indexOf(t) > -1)) return;
+    const pal = it.clave.split(' ');
+    const rango = it.clave.indexOf(toks[0]) === 0 ? 0 : (pal.some(w => w.indexOf(toks[0]) === 0) ? 1 : 2);
+    out.push({ it: it, s: rango * 1000 + it.clave.length });
+  });
+  out.sort((a, b) => a.s - b.s);
+  return out.map(x => resultadoLocal(x.it)).filter(Boolean).slice(0, max || 6);
+}
+
+async function jsonConTiempo(url, ms) {
+  const c = new AbortController(), tm = setTimeout(() => c.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: c.signal, headers: { Accept: 'application/json' } });
+    return r.ok ? await r.json() : null;
+  } catch (e) { return null; } finally { clearTimeout(tm); }
+}
+
+async function consultarNominatim(q, aprox) {
+  const u = 'https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=co&accept-language=es&bounded=0&viewbox=-74.45,4.84,-73.99,4.45&q=' + encodeURIComponent(q);
+  const d = await jsonConTiempo(u, 8000);
+  return (Array.isArray(d) ? d : []).map(r => {
+    const c = L.latLng(+r.lat, +r.lon), b = r.boundingbox ? r.boundingbox.map(Number) : null;
+    const nombre = String(r.display_name || '').split(', ').slice(0, 4).join(', ');
+    const bb = b ? L.latLngBounds([b[0], b[2]], [b[1], b[3]]) : L.latLngBounds(c, c);
+    const ap = !!aprox || bb.getSouthWest().distanceTo(bb.getNorthEast()) >= 3000;
+    return { name: nombre + (ap ? ' (ubicación aproximada)' : ''), center: c, bbox: bb, properties: { remoto: 'osm', aprox: ap } };
+  });
+}
+
+async function consultarEsri(q) {
+  const u = 'https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&maxLocations=5&outFields=Addr_type&forStorage=false&countryCode=COL&searchExtent='
+    + encodeURIComponent('-74.45,4.45,-73.99,4.84') + '&SingleLine=' + encodeURIComponent(q);
+  const d = await jsonConTiempo(u, 8000);
+  return ((d && d.candidates) || []).filter(c => c.score >= 80 && c.location).map(c => {
+    const ll = L.latLng(c.location.y, c.location.x), e = c.extent, tipo = c.attributes && c.attributes.Addr_type;
+    const bb = e ? L.latLngBounds([e.ymin, e.xmin], [e.ymax, e.xmax]) : L.latLngBounds(ll, ll);
+    const preciso = /^(PointAddress|StreetAddress|StreetAddressExt|StreetInt)$/.test(tipo || '') && bb.getSouthWest().distanceTo(bb.getNorthEast()) < 3000;
+    return { name: c.address + (preciso ? '' : ' (ubicación aproximada)'), center: ll, bbox: bb, properties: { remoto: 'esri', aprox: !preciso } };
+  });
+}
+
+/* Direcciones: se normaliza la nomenclatura de Bogotá y se consultan varias fuentes a la vez. */
+async function buscarRemoto(q, limite) {
+  const d = normalizarDireccion(q), suf = /bogot/i.test(q) ? '' : ', Bogotá, Colombia';
+  const tareas = d.esDir
+    ? [consultarEsri(d.texto + suf), consultarNominatim(d.texto.replace(' # ', ' ') + suf, false)].concat(d.conNumero ? [consultarNominatim(d.via + suf, true)] : [])
+    : [consultarNominatim(q + suf, false), consultarEsri(q + suf)];
+  const todos = (await Promise.all(tareas)).reduce((a, b) => a.concat(b), []);
+  const vistos = new Set(), out = [];
+  todos.forEach(r => {
+    if (limite && !limite.contains(r.center)) return;
+    const k = r.center.lat.toFixed(4) + ',' + r.center.lng.toFixed(4);
+    if (vistos.has(k)) return;
+    vistos.add(k); out.push(r);
+  });
+  return out;
+}
+
 function initBuscador(map) {
   if (!L.Control || !L.Control.Geocoder) return;
   try {
-    // Para un uso intensivo en producción conviene apuntar a un servidor Nominatim o Photon propio.
-    const nomOpts = {
-      geocodingQueryParams: { countrycodes: 'co', viewbox: '-74.45,4.84,-73.99,4.45', bounded: 0, 'accept-language': 'es' }
-    };
-    const nom = typeof L.Control.Geocoder.nominatim === 'function'
-      ? L.Control.Geocoder.nominatim(nomOpts)
-      : new L.Control.Geocoder.Nominatim(nomOpts);
-    const sufijo = q => (/bogot/i.test(q) ? q : q + ', Bogotá');
-    const bogota = {
-      geocode: function (q, cb, ctx) { return nom.geocode(sufijo(q), cb, ctx); },
-      suggest: function (q, cb, ctx) { return nom.suggest ? nom.suggest(sufijo(q), cb, ctx) : nom.geocode(sufijo(q), cb, ctx); }
+    const limite = map.options.maxBounds ? L.latLngBounds(map.options.maxBounds) : null;
+    let ctl;
+    const buscador = {
+      /* Al escribir: solo coincidencias locales (sin red). Las direcciones se consultan al pulsar Enter o la lupa. */
+      suggest: function (q, cb) {
+        const loc = buscarLocal(q, 6);
+        if (loc.length) cb(loc);
+        else { try { ctl._clearResults(); ctl.removeThrobberClass(); } catch (e) { /* sin sugerencias */ } }
+      },
+      geocode: function (q, cb) {
+        const loc = buscarLocal(q, 4);
+        buscarRemoto(q, limite).then(rem => cb(loc.concat(rem).slice(0, 8)), () => cb(loc));
+      }
     };
     const geoOpts = {
       position: 'topleft',
@@ -1773,30 +1917,36 @@ function initBuscador(map) {
       defaultMarkGeocode: false,
       placeholder: 'Busca tu barrio o dirección',
       errorMessage: 'No encontramos ese lugar',
-      suggestMinLength: 4,
-      suggestTimeout: 450,
+      suggestMinLength: 2,
+      suggestTimeout: 120,
       showResultIcons: false,
-      geocoder: bogota
+      geocoder: buscador
     };
-    let ctl;
     if (typeof L.Control.geocoder === 'function') ctl = L.Control.geocoder(geoOpts);
     else if (L.control && typeof L.control.geocoder === 'function') ctl = L.control.geocoder(geoOpts);
     else ctl = new L.Control.Geocoder(geoOpts);
     ctl.on('markgeocode', function (e) {
-      const g = e.geocode;
+      const g = e.geocode, loc = g.properties && g.properties.local;
       if (state.geoMarker) { map.removeLayer(state.geoMarker); state.geoMarker = null; }
-      if (g.bbox && g.bbox.isValid && g.bbox.isValid()) {
-        map.flyToBounds(g.bbox, { maxZoom: 17, animate: !reduceMotion, duration: 1.1 });
-      } else if (g.center) {
-        map.flyTo(g.center, 16);
-      }
-      if (g.center) {
-        state.geoMarker = L.marker(g.center, {
-          icon: L.divIcon({ className: 'geo-pin', html: '<span></span>', iconSize: [0, 0] }),
-          keyboard: false
-        }).addTo(map).bindTooltip(esc(g.name || 'Lugar buscado'), { className: 'tip', direction: 'top', offset: [0, -12], opacity: 1 });
-      }
+      ubQuitarPin();
+      if (loc && loc.tipo === 'sector') { enfocarSector(loc.cod); ubBusqueda(g, loc); return; }
+      const diag = g.bbox && g.bbox.isValid() ? g.bbox.getSouthWest().distanceTo(g.bbox.getNorthEast()) : 0;
+      const aprox = !!(g.properties && g.properties.aprox);
+      let z, c = g.center;
+      if (diag > 20 && diag < 3000) { z = Math.min(17, map.getBoundsZoom(g.bbox)); c = g.bbox.getCenter(); }
+      else z = diag >= 3000 ? 15 : (aprox || loc ? 16 : 17);
+      /* El mapa se corre un poco para que la tarjeta de resultado no tape el punto buscado. */
+      map.flyTo(map.unproject(map.project(c, z).add(ubDesp()), z), z, { animate: !reduceMotion, duration: 1.1 });
+      state.geoMarker = L.marker(g.center, {
+        icon: L.divIcon({ className: 'geo-pin', html: '<span></span>', iconSize: [0, 0] }),
+        keyboard: false
+      }).addTo(map).bindTooltip(esc(g.name || 'Lugar buscado'), { className: 'tip', direction: 'top', offset: [0, -12], opacity: 1 });
+      ubBusqueda(g, loc);
     }).addTo(map);
+    /* Enter o la lupa no cancelaban la sugerencia pendiente, y esa sugerencia descartaba la búsqueda de direcciones. */
+    const cancelarSugerencia = () => clearTimeout(ctl._suggestTimeout);
+    if (ctl._input) ctl._input.addEventListener('keydown', e => { if (e.keyCode === 13) cancelarSugerencia(); });
+    if (ctl._container) ctl._container.addEventListener('click', cancelarSugerencia);
   } catch (err) {
     console.warn('No se pudo iniciar el buscador:', err);
   }

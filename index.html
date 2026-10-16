@@ -20,7 +20,7 @@
    ========================================================================== */
 :root{
   --cobalt:#1B3FD8;
-  --cobalt-700:#1432A8;
+  --cobalt-700:#E3182F;
   --cobalt-900:#0B1E66;
   --ink:#0F1E4A;
   --ink-2:#4A5A85;
@@ -139,7 +139,7 @@ button,select,input{font-family:inherit}
   position:relative;z-index:5;
   display:flex;align-items:center;gap:14px;
   padding:10px 18px;color:#fff;
-  background:linear-gradient(110deg,#0B1E66 0%,#1B3FD8 58%,#2F6BFF 100%);
+  background:linear-gradient(110deg,#E3182F 0%,#E3182F 58%,#E3182F 100%);
   box-shadow:0 8px 22px -10px rgba(11,30,102,.65);
 }
 .brand{display:flex;align-items:center;gap:12px;min-width:0}
@@ -205,7 +205,7 @@ button.pill:hover{background:rgba(255,255,255,.26)}
    ========================================================================== */
 .kpi-fin{
   color:#fff;overflow:hidden;container-type:inline-size;
-  background:linear-gradient(155deg,#1B3FD8 0%,#0F2A9A 62%,#0B1E66 100%);
+  background:linear-gradient(155deg,#E3182F 0%,#E3182F 62%,#E3182F 100%);
   border:0;
   box-shadow:0 18px 34px -16px rgba(27,63,216,.8);
 }
@@ -274,8 +274,8 @@ button.pill:hover{background:rgba(255,255,255,.26)}
   font:600 13px var(--font);border:0;border-radius:10px;padding:10px 15px;cursor:pointer;
   transition:transform .15s,box-shadow .2s,background .2s;
 }
-.btn-primary{background:var(--cobalt);color:#fff;box-shadow:0 8px 18px -8px rgba(27,63,216,.8)}
-.btn-primary:hover{background:var(--cobalt-700);transform:translateY(-1px)}
+.btn-primary{background:#E3182F;color:#fffafb;box-shadow:0 8px 18px -8px rgba(227,24,47,.8)}
+.btn-primary:hover{background:var(#E3182F);transform:translateY(-1px)}
 .btn-ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.4)}
 .btn-ghost:hover{background:rgba(255,255,255,.28)}
 .link{border:0;background:none;padding:2px 0;color:var(--cobalt);font-weight:600;font-size:12.5px;cursor:pointer}
@@ -588,6 +588,116 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
 .leaflet-control-geocoder{overflow:visible!important}
 .leaflet-control-geocoder-alternatives{z-index:1000;max-height:min(46vh,320px);overflow-y:auto}
 .leaflet-control-geocoder-alternatives li a b{font-weight:700}
+
+/* ==========================================================================
+   ESTADO DE EJECUCIÓN DE LAS OBRAS (panel izquierdo)
+   ========================================================================== */
+.exec{container-type:inline-size;container-name:exec;padding:14px 14px 12px}
+.exec h2{font-size:14px;line-height:1.3}
+.exec .dot{display:inline-block;flex:none;width:7px;height:7px;border-radius:50%;background:#9AA7C7;box-shadow:none;margin:0}
+.exec .dot.eje{background:var(--work)}
+.exec .dot.liq{background:var(--cobalt)}
+.exec-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;min-height:22px}
+.exec-badge{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 7px;border-radius:999px;font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--line-2);white-space:nowrap}
+.exec-badge b{color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+.exec-cap{margin:10px 0 2px;font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.exec-bars{display:grid;gap:2px}
+.exec-bars.loading{height:118px;border-radius:10px;background:linear-gradient(100deg,#EEF2FA 30%,#F8FAFE 50%,#EEF2FA 70%);background-size:220% 100%;animation:shimmer 1.4s linear infinite}
+.exec-bar{position:relative;display:block;width:100%;margin:0;padding:4px 8px 5px;border:0;border-radius:9px;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:background .15s,opacity .25s,box-shadow .15s}
+.exec-bar:hover{background:#F3F6FD}
+.exec-bar[aria-pressed="true"]{background:#EEF2FF;box-shadow:inset 0 0 0 1.5px #C7D4FF}
+.exec[data-sel] .exec-bar:not([aria-pressed="true"]){opacity:.5}
+.exec[data-sel] .exec-bar:not([aria-pressed="true"]):hover{opacity:.9}
+.exec-bar .l1{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:600;line-height:1.25}
+.exec-bar .l1 b{font-weight:800;font-variant-numeric:tabular-nums}
+.exec-track{display:block;height:6px;margin-top:4px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.exec-fill{display:flex;gap:2px;height:100%;width:0;border-radius:99px;overflow:hidden;transition:width 1s cubic-bezier(.16,1,.3,1)}
+.exec-fill i{display:block;height:100%;min-width:3px}
+.exec-fill .liq{background:var(--cobalt)}
+.exec-fill .eje{background:var(--work)}
+.exec-fill .otr{background:#9AA7C7}
+.exec-bar[data-tip]::after{
+  content:attr(data-tip);position:absolute;left:8px;bottom:calc(100% - 2px);z-index:6;
+  width:max-content;max-width:min(250px,calc(100% - 16px));padding:8px 11px;border-radius:10px;
+  background:rgba(15,30,74,.94);color:#fff;font-size:11.5px;font-weight:500;line-height:1.45;white-space:pre-line;
+  box-shadow:0 14px 28px -10px rgba(0,0,0,.5);opacity:0;transform:translateY(4px);pointer-events:none;
+  transition:opacity .15s,transform .15s;
+}
+.exec-bar[data-tip]:hover::after,.exec-bar[data-tip]:focus-visible::after{opacity:1;transform:none}
+
+.exec-sel{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 8px;margin-top:6px;padding:8px 8px 8px 11px;border-radius:10px;background:#EEF2FF;font-size:12px;line-height:1.3;color:var(--ink-2)}
+.exec-sel b{color:var(--ink)}
+.exec-sel>span:first-child{flex:1 1 100%}
+.exec-sel .acts{display:flex;gap:4px;flex:none;margin-left:auto}
+.exec-sel button{border:0;border-radius:8px;padding:5px 9px;font:600 12px var(--font);cursor:pointer}
+.exec-sel .go{background:var(--cobalt);color:#fff}
+.exec-sel .go:hover{background:var(--cobalt-700)}
+.exec-sel .no{background:#fff;color:var(--ink-2)}
+
+.exec-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:6px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:#F7F9FE;color:var(--cobalt);font:600 12.5px var(--font);cursor:pointer;transition:background .15s,border-color .15s}
+.exec-toggle:hover{background:#EEF2FF;border-color:#C7D4FF}
+.exec-toggle svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.exec-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
+.exec-collapse{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s ease}
+.exec-collapse.open{grid-template-rows:1fr}
+.exec-collapse>.in{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s .35s}
+.exec-collapse.open>.in{visibility:visible;transition-delay:0s}
+
+.exec-table{margin-top:6px}
+.x-th{display:none}
+.xrow{border-top:1px solid var(--line-2)}
+.xrow:first-of-type{border-top:0}
+.xbtn{
+  display:grid;grid-template-columns:16px minmax(0,1fr) auto;
+  grid-template-areas:"ex nm val" ". meta meta";
+  column-gap:8px;row-gap:3px;align-items:start;
+  width:100%;margin:0;padding:8px 4px;border:0;border-radius:8px;background:transparent;
+  text-align:left;font:inherit;color:inherit;cursor:pointer;transition:background .15s;
+}
+.xbtn:hover{background:#F3F6FD}
+.xrow.sel .xbtn{background:#EEF2FF}
+.x-ex{grid-area:ex;display:grid;place-items:center;width:16px;height:16px;margin-top:1px;border:1.5px solid #B9C5E6;border-radius:5px;font-size:12px;font-weight:700;line-height:1;color:var(--ink-2)}
+.xrow.sel .x-ex{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.x-nm{grid-area:nm;font-size:12.5px;font-weight:700;line-height:1.3}
+.x-val{grid-area:val;font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1.3}
+.x-meta{grid-area:meta;display:flex;flex-wrap:wrap;align-items:center;gap:2px 12px;font-size:11.5px;color:var(--ink-2)}
+.x-meta .tipo{color:var(--ink-3);font-weight:600}
+.x-meta .estados{display:inline-flex;flex-wrap:wrap;gap:2px 10px}
+.x-meta .st,.x-meta .n,.x-meta .m2{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.x-meta b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.x-list{list-style:none;margin:0 0 8px 24px;padding:2px 6px 2px 11px;border-left:2px solid #DCE5FF;display:grid;gap:6px;max-height:196px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#C3CDE6 transparent}
+.x-list li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:11.5px;color:var(--ink-2)}
+.x-list .nc{padding:1px 7px;border-radius:6px;background:#EEF2FF;color:var(--cobalt);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.x-list .tc{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.x-list .est{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.x-list .tc b{color:var(--ink);font-weight:600}
+.x-list .vc{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.xtot{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px;margin-top:4px;padding:9px 4px 2px;border-top:1.5px solid var(--line);font-size:12px;color:var(--ink-2)}
+.xtot>b:first-child{font-size:12.5px;color:var(--ink)}
+.xtot b{color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+.xtot .tv{margin-left:auto;font-size:12.5px}
+
+@container exec (min-width:520px){
+  .x-th,.xbtn{
+    grid-template-columns:16px minmax(0,1.5fr) minmax(0,.9fr) minmax(0,1.3fr) 56px 84px 96px;
+    grid-template-areas:"ex nm tp st n m v";
+    column-gap:10px;align-items:center;
+  }
+  .x-th{display:grid;padding:6px 4px;border-bottom:1.5px solid var(--line);font-size:11px;font-weight:700;color:var(--ink-3)}
+  .x-th .r{text-align:right}
+  .x-meta{display:contents}
+  .x-meta .tipo{grid-area:tp}
+  .x-meta .estados{grid-area:st}
+  .x-meta .n{grid-area:n;justify-content:flex-end}
+  .x-meta .m2{grid-area:m;justify-content:flex-end}
+  .x-val{grid-area:v;text-align:right}
+  .x-list .est{position:static;width:auto;height:auto;overflow:visible;clip:auto;color:var(--ink-2)}
+  .x-meta .u{display:none}
+  .x-th .c1{grid-area:nm}.x-th .c2{grid-area:tp}.x-th .c3{grid-area:st}.x-th .c4{grid-area:n}.x-th .c5{grid-area:m}.x-th .c6{grid-area:v}
+}
+@media (prefers-reduced-motion:reduce){
+  .exec-fill,.exec-collapse,.exec-toggle svg{transition:none}
+}
 </style>
 </head>
 
@@ -635,7 +745,7 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
     <span class="brand-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAByCAYAAACY/xW0AAAovElEQVR42u2deXydVZ3/399znrtlX5t0X9iLtCAog4IpqKAyoICBwXUU5OeCo6jD8HMZKP5wXGaGTRB0VFAQbWQAkXEbaUsBEdlaBAHZuidNmmZP7n2ec76/P557s7Rp2rQppJjn9bqvpslz73Pu+Zzv57ufA/vvJZeCURqt0hDEL8y+fqiCGXpeo43/j0zaSdpf0MxPoqygwSxhmgpNbmf3rZ+1sFIGktUaUCFQY7yriIyUWyhRMUlVXywqqfj2/PtEuxTxgUhPpDogqp0iptNCm7N0iCbaZ276U7sMe8/2wBfGBk1+Z/dNATxsbJoHtJVpevYogK6rWjwzGZhDQ3GHKywUWAAyB6hRoTItYgIEi2BFRsChO0yEDE6IojgFhxKhDKh6UbYpbLXCOg8vC/oXVXlWffjs7FrWydNP57YHHBpMEyu1EV41wGWySWkTmFoa5ERWRsP/tnH60UVJ9QtD9I2R+uNEZDEwPyOmJJkHzylEKJEqDsXHk6qgynYTLDs+e5S5EQHEgFiEQIQAsBIvh5wqfeoikHUW/mzgYVX9g7Op1bM2/WnryM9vtPFPr6x0yyQB1qygwWwP6ua6xYeLmBMUPcnDGwzMKzaxms2pklMlQr2gfojGY1AKCE3Q+HTYjyr5FQNiDJikCEkMViCrStb7rSI8piIrjPe/r6+OHh8u4UqjbQLOpsmzj8GWV1NaV9Bgl7DSFVa0gt1Se+SxofWnC+YUjy4qN9aowgCerCqCRvG9YojRlFd5cW7HEmISiElLLPG96nGqz6vKcov/RXfYd9/B7c93Fd6/nIZg+Bzs9wDHuqlRhhtJrdNff3So7r0gp1nh8CIxZFXpV4+iLq8jhVfASp440DUvnWLTIpIWQ6hKVv16EX6JZ1l9y+qVQ4u70V5Gky4Fv18CvD2wT894Q3VVlDvTCx9C5PhSYxiIQVVQB2Ly0rnfWPpjfHcvqFfEpERMRuLv6tQ/5lVuFuG2Gc1PtA7p6onT0/LKAAuSX5mb6o9caIXznOr7isXWO5TeWFKjPKiG1/blQb1HbLEYSYrQ7d0WQW4W1eunt6x+uQD0zlzBSQFwbPA0msIgN9Uf+QYRPi1KY5Ex6V71hOpd3j0xrwVJ3RPJVlSTYmyJGHq86xTkxl4f/ecBW/7cUhAQ2Qva3ieTupyGoGARr689crG1XAKcUyxGutXhY2m18jcI6hg621kkKDOWHu+bveoV321Zff1S8HsjzTLBAx1cbetmLZ6ZCPmiiJyfMSbZ5V3eYBrUrVPXToBOigmKxNDn/ar+yH9mftuax5VLDSzV8epmM5FSK+AbwW6cduRnUpE8VmLtJ0M02emjgiU8JbVjS5sIEuRUdZuPXFLkhKLAPLihftHnhKU+73+bV1SC8w9UAV1Xt/iNKeGqIrHH9eDJxTp2SmL3eG7VGcSWx7TdtDbXc/7ftT/fNR7KNns3gEYr4C8Daa5f/OWUyKqEmOPaNXKhqpopid1LiRbrQbf5KCoxpnFesmTFc7WHHyA0uaHQ5z6S4IIh9VLd4nkZke+XGHvSNh+hqBPETsEz0b6VRmVig6zqhn6jp83ftPoJBSvgJlyCC+C+OH3RKUUiD6XFnNTuw0hBp8DdN5dBgi51zorMKvLyvy/VLDpKYJeSPF4JFs37tmvrF30iLebbgBlQ78wUsK+UJLtisTZSvynrorfMbX3qhbF85d2WYB0G7vq6xZdVmOD6SJWsqp8C9xWVZNurzqXEzAhs4q4XKo8uHwos7TnAsoIGKzS5dfWLv1Zpg0u7fRS5OJtjpqb9lQe5S11UZszhiWT4XwJ+BQ12jym6oHPX1i36arVNfHmbDyOdspAngyMVVpgg0e7dx+c2r75xNPdJdhfcl+sWfbrKBtd0+SjyU+BOEj8ZTSAK2uMlOGLG5kfXE7Oq3y2KVhrtiayMXqpf9I5iY6/p9s5NgTuZ/GQkxPtiY8siH/5bHMZslN2S4IJl1j796Dk5jR5DpCqnqlM6d1LKsk9icMixM5off2QZ2LPz/vEYYDWKgun14Y/SYquz6v0UuJPVdULTxpgIdzFAI41jS3BBWa+tX3xRlQn+c5sPI0GCqamcvCKcl7xsqLpwXsualwoMbEajZmjym+qPmpuApd0+8kz5uZNeHTvUlRmbtnAOwAoazKgU3USjCGiI+7cSY0vjstQpo2ryG1wiOVVU5D0KsoSVbgeKLijnl6cf8fq02j+FcW55Su/uJy6TAVEl59BDCzS9HXixchZvvpQxxmihvnvq2i9cJo+6UmOTAm+Mf9tggpFuUZPbVH/UYYI/vcu7fZcZknwDgvpJ0qL1mgFZTdzTcQzws+3oN3aQI3UXlBgbFArOJ/wyBs3m0P7+uLvMTGmACaRp8QoielhsT01TKfxBQDfXLSrOwbNpMTOzsXFlJkRaAVQRBZfNIvNmoekU2ZfXY/v6SZaUgPf5UUyJ9F4A7IvEmH71T85uXr1omAQ3GoBITEOpsTNzqNtrcEUQayGKwHtMMkF2YIDipZ9n5v13MXP57cz4zW30HvM6unp7IBGAc0jhfVPXHs16FLfG1j1XdWDZIMAr2CJ5KTs1IaJ7bVyJgHNEHZ248lLCdIrudS+QeO+pVP7T+UhRBpNMULxoIfNuupa1Psu2LVtwmTT9YY6Bzq7YTZ+6xn05VQyUJxLFVQABwBJWOqXRbpBnGwZUJW6JHZ9elQIVi6DO4YOA8m99heIz3oXr7mbzjTdR9aFzMF7x3iHW4qOI0tkzmX35JVSWl1N74gmEW9vZ8K3r6P+feymvqMD4fOOeCOr9FIXvwpJ2oCmRlBFXDbwshZBW87RjFoSSe0ZEEvmWSNldcLW/HzeQjU04Y9DuHsq++i/UfPmzO3yQbg+Q6g6GVpjLcd+RDVQ/t5byTDEqQORIlJXG9+5vIA82ueZtjH04fgVfIsb0eXfarJY1vwzikNZKnyNcVGJsole9A+xug9vTiztyIWX/eA7JGXX0Pf0cW2/7b4rOfBfqHOrjYhKNIjAWSQSjDQodyKLZHFKcIZFMUnLGO8n98XFqPnUBUl5K14oHabvxZkoiIRkk9g+Q88ymYYiGUbyYgwBJJfINpn5fQOyTIqZHTT1AsGQo1LUwiK3Y3ds0xsbujhy8gBl3/IBkVSUAJaecSPVnPobJS5pIHE8xQTAI5iA43iPW0nfXb+j4lyvQKKRu5R2YGXW8YekX48nIP67kpOMJD57Hho9fzMyKKgLPpAZZrMX39hHlckhtNTK3GhIB4dZtRBs2k0wmCYqKwLl9QNUC4lIj/GA1/qDdphsjEEZEbe0UnXM6yapK/EAWjSI0irBiBqlIjEG7uum66nt0XPrvaE9v3hqI9XBuzdNs/eCFmJpKyv/lQkxFWUzr1oL3+CjChxE4x4x/OJP2GTV0bG0bXByTFdyooxPzukOo+v5/MH3VHcy8/05m3X8Xs1fdSfWPr6F77gx6Ojthgr+DAD6ewf68kbWywBMznWrBJ945uGGIixxm/mx8XQ2p498YgxkEYE1erfrB+31nN61nfISB5feTfP1iSj/5YUxJMd57BOi99Q60b4Dau3+ErSwfqaOHuUzqPYENKF3yJnpX/pFitejGFjLlZcgkkmSxFtfRSfq9p1J7/dcxRZkh5kJJ1NZQfcapFL3pDaw57f24Z16irKwMcRND1wriFERsJ0BQqN8RpcrJ8MjEjuBqGEJlOTVXf5X0W46FRAKTTKKqSBBLXNweZSBySCKg55bbGVi+itq7b6Xo798W61vVQeDSJ74ZU1sVgxtGEAxb0T6/7YUx+bC50nDDVUQDWXxnF+u/dhVtP/gp1QVrexLoXN/bhzlyIbU3fBOTTuGjcIhpRFD1aBSRqZvGIbdcz6NvOZ1ELkfRhNkVYiKUQP3WQYrWmLbLx1xDRnADWSquuITid56ELSrCJpNDESjisKNYm3dr8ky8uYXUsccMgkvBsDAG9Z7MO5ZQ/oVPxAZHYLeTBjNI1cMXWqIoQ2p6HQdc+28MnHAM7Z2d6CQIeUpgcWFIxVcuwqRTaBQiQTAUey+wUiKBD0MqDj6Iqgs/wobWFjSZmJg1BjKgqiqmZbgOHtv3FYFcBNOqSS95EziPeo86hxiDb2un+Zh30PzmdzPw+/tjV0YEVaXsS5+h9lc/iQEcthgKII/UHkOuEyJEazcQ/vXFGORh71Pvcdkcokqi4Tg293bh5dUGNyDa2Iw9+giK3npC/H3H0q+BRb3noP/zEfoOnMOWDRtiFSeyN/SsFsHjO1VM63bJhrHeqYMSHHV0DuraAoiSSVN0+sn4bR20nnMBuSefGZQ8yaQxleUjV3EeQN/WTtdV36P/tyviJtNhf9NsltYzzmPTwW+m/XOXQRgOUVjB0BOhq62NflHcq4quEHV2kjr33dTddDXG2vz2MTLGW2LfuKS2lrf8+uckPnAGW7u7ibzbm/IKDUQQZfOMzY9u3X2AAUkmcc1b2PKzO/NSNGSOSVGG8n/9HNNW3I7v6Kb31tuHdGhBcrcPbgBuw2Y6/99VbDnlH2j/7L/GxpIy6C9WXXcFZRdfSPeVN9Lz45/HzOAcqGITCQZ6enj29jspyhQh+8Sn3B2NZ3A9vZR+5SLqf/xtkvPnsAtTdcTC8OopO2A+i266jvJ//zKbuzuJ9hxfTcSr47k4pNJoB3fAEdVuM8ZAtH+A5EELqDrlxLz7M/ILaBgSTKuh9FMfIbl44bAIjuzwZVUE7xyJxQuZ+dwDlF/6z3RffSMDq/6IWJOnckPquGOo/MaXSBx6EP2/+O3I8ThHIp3myI9+aB8FDHbjsgbX3UNiyXFU/fMn84EdNy6aFRG8d/goZN7HPkz09uNp7diG2vHbFAJqY0N5TfybLWIuHTS0pNPAqNEDMYaot5fKL/4TpW84CnVux2KQIEC9UnX15RSfe0bs7owySFXFGBPTmPeYqgpKP/1RbHUtrqV15GjDCHWeym9/jbKLPzVkoedBtkHAcf96CXbxYXT2dO84pn3OzIIPQzLvOglUY/dwD8YgxgwGgIqPP5a2/l78HvG0SBjvBvhwnEQCc1k+0a/Qasf4UAVMddUo6QsXv7yPQXFuTIkyxtCxYRNtL7yIz0+GqSyn7qFfkjnt5PzCsIOGCEbIvPV40m86Bo3cCD2sed8xW1ZCdy77yheHaMxGUl46xFh7qcvDMEcWnw9WjG8oBmyv9/0a6BP5JJI35FOFBl2f1/s6mpFlUim2fOeH5Nq3xau0EKkKgvhVAMWMbgn6fK736bvu5juHvI6m1x3LHce9lc6XXgYRggPnIZn0qIP3YRh//0QwIvAh1vDC8pU0P/IYyZKSV56qJR5HbmPzxBQr5I1Z3YOlKuDTYgD98+yNT27MWwFDddEeeX7nz1VsOkXXPfew9ff3xZQSxS5S/29W0HbuJ+j92S9iyzA/yaoau1L5V+F68ge3sOCQwzj7d7/EPvVXNv48fp/vz+LDEO/cyGiWKiaRILf6KbZ+7At0fu2aQadKVVn55csJtjVTmky98rW9XrGpFJ2/+n0cHDQGH0UxizmHOj/sZzdiPoa/fOQoxJg2rPoDyURq3NG5eEM1ASOrAC20kxqYlqd/eS6nWtjFdUSAQ3MhvqSIA5b9iLrT3oFGESaZoPv7P6H11A8ysPxB/Nb2HajYWDv4kjzN9z7zHAe94x1UH38spn4a2tOHOofNpLCJBDYI4kRFIRlhhOxDj9Ly1rPp+9kvcBubh4mPctatP2TRJz5Nb3c3Xl5ZiNV7gtJicg89xguXfwsxFhskMDbIv+ywnwOMsaO+bBBgggSP3vRjNv3mf6mqqNwTr8DE+OlvY3qOcQ2gSQESRp7r9z5rhZQflg8WBecdNd/5OsVve0tsYFmL29JGxxe+SvrkBmr/+/tIOhVLrQhGhJ62Nu4+75NIbx9vu+bfqVl4KN1tbfRvaqbqiMNQ5+jI9hMShy07N2xixVeWEtiAhn+7jJLaWrwqgtD51auQVJL6P68gqK+NGcHEAJfPm8PR1/8Hf+rqofWOX1NXXYtMZIZGx85aqfOUlpez+evfpvXpZ6htfDemvASbThGk0kTZLFF/P2IMxXXTEGuHGErADWTpWruev97za1665WccUFJJpQkw4+AjBU1iTK/6LQO59B/i3zb5PMAx4T/bXLbxgLqOl5NiDulXr5LfwVezOXTOTFInHBuDW9AV1pI49ECKzzs3BjcXQhBLapTL8dMzzyXo6mF6VS13H340DctupeiwgzF9A1S9bmGcTgNsOs3au3/Fz8/9ABVzF1CWDbn3vE/zrjtupWD0SVkpReeeEYM7PF4tgsvlMEFAxXveydO3LqMyU0LS77DB+x7mZWKrXRJjhxGNQl1FFVvu+h1/uf2X9IjGkTUT7zE7GMHLpAmJd6MffEYYIQNZihAWVdUwLUiSETMudSOoKzLWOu/uPbj94RH7aAUFh1hoitbLkauTyCEDqB8MXdrYkfddPdiqinj1eY+prqRu1Z1xXth7SASo9xhr6WrbSsuqFZxz/Y0c+ImP8pevX8nD5/0Tqdn1zJo7l6J5c/CqJKqrWHfNd+lq38qRH/swJ337P3lm6Td56tobiXI5bDqNeqX65qsRIyPCf4OFBPm5Cr0nmlGPnz03/tvupD23N3BG8/8HsmhLK3YXk25VmV5dQ40qoXejLq/IOcKYRocekRKS5QEJMQSqBMi4qx3z5bLiVO+K3aMtg0MNhv/CqX9AjDl7aAN7xSSS5La0snHVg8w/87ShL6mKBobh94oxeOeomF7P27/xTf74yU9SMnsWh11yEWWvX8zjn7iI2kMPJSgtwTlH2NeHTQYcd8ctzHvXyWx64CHuvexLnHLtdaQzGXwUIdYiyUQcEh2m+0weaJNKAvDUbcs49pYbmN1wAl5AdlVW5t0OmaDhMUL1HgO0P/AQfz31A0wrKSWpMqa84zxJILkziAK7o4VcyMvodvH4cdBzAmO7fLRVU/qbvHvkRgC8JJ8TFhM80Ou9Du8m9OrJpNK0//PluI5Oyt/4etQaqg4+kEAszkXYPIWp93E40StvvPgi3ItrWXHmOZz8x/uYefJJTHv8fqKe3jjYYS1v/c6VVB1yMCUzp9Pb2sbtZzRy8OlnceCFF8RuVUFancNYi8+HKU0Q0LlhEy4KyXZ28adv38Cmu+6h5LIvxc/v7BqqgRp1vRuktHgkoNksOpDNFw/mXcDycvqBdWE/5b6Y5N42egxbpBPnqakrNtZ2Ov/rOeue3Lb9Ph3BMFMCn9z6VJgtX5sSMy8XZ+0NqgSJBCWdvaz/xMU8UZKhs7+bA85ppOGH12FNgmxfH8ZaEsnkoJtjjXDcDVfR88JLrDy9kZMfupfimTNIlJXGNK/KnJMaBgsEfvGPF1AklhN/cP0QQ/jY3DOBpa99G0X5sqANjzzGstPeS0noSeQibG8fC8tqCcRAFLHlHe/Hb2lFEsmR1CuChjlsfR21v7oFU1qCughjA7qu+h7dV/4XtqYK39uLmTuL6ctvJ0Lp8xGvUjB0NyRYTKgqVrhlVNIYcjgaraxtGlhXt/i+jDFzcxoN6WFVMskU82vqqI9CciUpOn/6Cx5s3Up2Vj0vLl9B9YEH8u57fj5Ye5XtjUtz3v67u/ifo0/g/rM+yFuX34NNJvI1z0KUzRKkUjzy/ZvZ9Lvfcf7jfyJZXUVPaysltbWDg1z30MMse08jC5eciC0u4sW7f0V9dz9zi8ooTheRKqlGs7nBs5F0Wyd+6zYkmcofnTAYE0RzWUwqPVIPi6B9/fit7bGa6elBKsp2mRF69cHFp0VMr7oXBkr6lsdQNvkdAB6uhw3c45QPbZ8PEVUChVKbAJSKqhralj9Ed7aPOZkM8uIqHjv/M8y98Hw6Nm1ixZeWkjKG4664lMO+cgkPnnEW63/SxPzzPogPI8QabDJJtq+Ph/71Co54+zvxLuLh//dN/njDjSw6+2xe97F/pGP9Bn73T1+gZmsPcsdviaKIw8pKqSqvpUxM/gwjIZs3gmKfL4BEIv53OwlGY4NwtMTB4HsSibgEadJf6jNiTdbrTw5+/vlsvKXzyKOJBr/FYMOwCe7t9mFnQkx5GJ8RJKNZm1aVaRVV1FCFV4+UCVtvu4s/Nt1JR38/lcZSZgOePv0DmIpy6jO1dDbdjX7k/Yg1eOexiYCXlq9EWraQ+tMaHnvzqWzt62FBUTH9193E/T+8je7+fupswJzqeiptEiMCLjaABstRZBQL2eRfOsrvR5XKYX/b6T2TSnrVILbHuwHvg5uH21KjAhzT9KVGNi9tW1+36N4iMe/p0sgxxt4c4j2WfBF1HvAyFxEVlWNFSCJ4IOsiJG1gcxsumyPIpCHeI5yuF16mzAu1QYpEcZKZpRUECoEx5KIIlyqLP0vBekV2w7/Vnl60sxtSqXxd17CoXDaLlpbu4BZpNov2dqOpFNrdM1T9Oa5YkhlfYXshlboHMXRBXakJgg7n/mdu66MvLNvJHtIjwFvBCgN4QX4KnKHjXMfiPZmCezLsOyZtAjBku3tx7dsIZk4fvMEGASkMKTGkZNgZY14JTDD0QbszkHw1SPLY1+Pbt8VF9oUUo5jBFGRQUzVEwfkkQTB/LqmG47EV5fj+fsyMunFlgQoLS5IJSCZ3DXK+QjUu9i/auS8+tnGFgW8Dw/bVGQPgAk2HaX7bORC1JsXU5kaj6T1MhWkuhw5kRw8wyM7ihOP4fBfXStfedv3uBOchCgfrx0rPfx+l579v1Hjzrpa5DmTBCMExi8lubsGv30Qimdj58PMLzUyvw86ezsDqp7GqcRHj7oHsSsSYbnUP/6BlzcpC8/4uAR5mTXesq1t0Z5ExH8v5sWl6XD5gKomk0/tIKSliTRzjvuQKfGc3kkzgu3spavx7Mu96a0yFhUSGMUgQ+++utQ3fMayj0StqDckF83aLls2cmbjyEqb/fhmbvvcjWr9+LZXTpsFOap3FWlx7B8UXvJ+qz3+cP5/cSPD8WjJ9A7uMmBUWp0EElf9YCn4JDcPr23cOcD5InU/kmJsGjP/YuDsNxwTAIgm7QzXDBJZYgCq9P/sFblMLpjiD69pK4uAFFP392wfTlmKE8OV1dH3jOorefQrZBx6h61vfwdRUgXq0P4tdMIcZj/x6581u+RZZTSWpufkqmFYD3lN9znsoPeUk7K46FrwnKC2ByLHgx9ex8fu3sOXyK6mrqcWOUQSv4DNiTZd3f2ltCe6IldLKnWZXglHYwykIrU88tL5u0WNFxh7VP56GtPHEf4Fsd/dugTYuW6eyAs3lMJlMfKBcvrtgSCUY3PpNdN7wTUxZCaa0dPyGTj7hormQ5979YTYXJTh5zSoe++4PeeyKrzG9avpO+47EWgba2zn00x/nqMu/yE9PPp3U+mYWlBbhCq0/Yzw4hZg+kW8cw6Ph8lh6d1qnN+onxXtD40Xku0kR0QkohlHvMakkJpMZHr3FR9GotFeohdZcGFvCefdlt/qRnIut9MK/w8EzBkVJHnk4M1Y+SOmF56G9vTsU3e88q2Dzxf2guRwCpCJHuYtTm8Z7SkJPjRemOTP6yxvqI6FY47aSZOioxFBmEtsdZD269G7z7tk5VbnbLgVz4hjSuxOKHjK2fNIv68zqVxNiasO9MbZEIHLYqkpMcdGIBsaaww5hvTF4P1Rr5Xt64zaZVAqZMQ3X04fJ5pBcSNTbR1Cos97TLCAgpaWk33JcPHHh7hequm0d8Q/lpUhdLb6vj7k//x7zptWCNRx5wUc5/L1nkAiCsY0s57HlZYhznPG7u2j+4W10XnE1ZdU1O9XdxFUbplf0Cnn66ZzSaJduF7naLYAFdDkNwdx1K7etq1v84xJjPrdtL4wtMXHeNnX4IRhj0Cga1L01R7wOKsrIRiGZRAodGCD91uOJSooI5s6i6sLzePq8zxD9ejm1f3cMZccfS/uttxPkIgJrRp/Egi86/LUjpaBhGMerd2uxKGoMxR98L33NW6g+/334WfU8ddoHaDn1XLrKi3n7Uw/x6I3f57HLv8qs6pmDvv4O8xFYBrZu5ZDPfpLFV3yFn538bjIbWzigpDhu7BtlPAq+WKzp8NETc5sP+YmyxsguwN0pwCMyTIHc0OPcpwyS9PEBWDI+PRsXh3ggc9LxQ+5qPo9cdcB8So46gq4Hn6CitggfRuSKM8z60bVsvPc+fvmec8h4oeEv95Pd1smmVQ/Q1t/LtCCFLZwqLPmdBQpu0i9+OEjr6hy2tjp2i4bTu0j8/0L3vQw7PHz7Wm4RsAFRdzf2hDcy5/1nsebK63j2oospyfZz9NVfh+pKMMKhZ5xG/SEHk0mn4z2NdmJ5+2yW4oMWgPe87epvsuW/7yF3cxNSkR4ZnBm2agWMUfny0LlJewGwgF9Go529semva+sW31Nh7ZldPorGjGwVMkDD1oBYg+voJPGGxZSe+rbY6Cm0mXqPCQIO/j8f4enff5S6gXJSRRk6b/k5zevX0XvYAbQ89AdmkOblG25iazjAmmu/xaGlczESDE2EyOBuPoiQOGD+KN70GH3tzsfvj6I4Vl34uZDVCiMIQ2yQ4KUPXcjLy+/j5ZdepOf5p5lVPY+u/72P7ooSpr19CW3P/pXn77yTipLKnRpuYgy53m5mveNkyg87hOd/+3v6//xnygpFDdtHh1FXKoHt8tH/zm1Zc88y2O2Tz8ak3MbBBSzX5FTP1F3sfZNNWIwIfrsAvy/OUH/ZF+J2yjCMJScfYfJRxIIzT6f5/Y20/XYVtUWlVLzvLNILZrHgrL9n8acuoON3K+h8+lkO+NDZzDv1FDZf9i2i9c24dCZfCCBEUYgaE9eFReHIAnTZSWy5QN/pFFJWipSW5JMRSaSkeLDN1VaUERVl8MXFTDv3dKJDFnDAFy8i2tLG2ku/yeYf/Yy+8hLc0v9LyyOP88LNP2Bu2WyMG4OiO7dSUVmNP/sM/vrjn1LR1sn0+pmEoY9DwHawSl0tQg4XWcvFQ8g0jcfkGDOobQBdN23xH0qtObZXndt+e2GxlrCjk+DrFzP9ve/JZ4vsoK5z1pCq33XoL9u+jYQNMIVC8p2NKYziPtxhOlhRTFnpnhleuRD6BwZ7kNF8dikfQgw7u+KsVRCMdLnyi8T19Ma1VZkU2ADN5bC78u+9QjoJQUDU04vv6o51bxjx1OkfILV2EyVFRaj3UaUJgq0uunFey5qPj/eo2V0aTStoMCeyMtogeqVBfrqz7Xc8SiKRJizO4J0fpOF4DpTe1radGjOKxhugBQEOj7a2DWuPyR+6iiISS2icU7Y7lN3o1vZBg2o8jp3YfIP5cEoNI7StHxHBBAGheshl8QW/PV/VOVj4Hxh0YACQuG7c7YZl3p1FncckAigpwonQ+/I6NnS2U40jo6ppjOlyrjUp5iuXgrksXwU7Tqdh7HviTzw6WF8XrskYW6i6NCMBhnajbExAhw93rICQOA+0c89Bh9TkbtwrupN4NHtST6mjv0lk5LhGfUY8FiFuY2H7+3cVPy9E+QrralsHFWKZny6l0iRcjQ1sh4YXzN785PeGH7w9kQAPHq2zbvqi8yok+K9tPhr1KLusd3SHObL6qnbr7teXDRKkjSUjxlWZwPZ49+DsljUnQKPk3aJxrd/d8mvjnfCQl5Odt3YMVFxcZOxB/aMc0pG0AdV26miHvY3Zx4YVRKqhs1wYezTYPSGnYDfFXJVGO39t08C6uvJLkyK39av67QlAprYZnBiMUVdugqAtct+a37zm8ZhBm/aoL1zG9+BLDSxlfd2iVSXGvqlH3dRZwRN8edQXizEDqs/4IPP6hzY8lGsEL3vYqjGuXF0TS0XAJ+BzUXzq6BQiEyy8NuZB78RfMGfDQ/3QiOxFH864AD47fyDx9JY1f+xHbyo31nqmLKqJlN4KE9her1fN3fzkquU0BGePw+fda4ouBD4uAz5et6hGkaeMkapQp05n2Xu9G+/WPuD9M2KCo2dsXpCFJi972UVn9mBF+MtolOkta7bk1P/forjkwU9BtFfgqgV1qEfNR2dufrSvYNzu7WebPRP7OJsxb8uT/7XNR8tLTbDvDvH427Ga7YD3X5u15fE/xAXsTRMyn7IXq84AuqX2qAM00Ce8aiYatvX11LX74JaItb3qHp51SOWbWTlNJ4Ka90qCC1QNjaau9fHns6qfLxVrmJLicVNzAiFU3xdJ4sOycmXURBMygadJmb0T/ya3nIZgbvPqG9u9u70ypupoCrrdnb+49bNX/Gfnb370mdhqnthdGWUCVqFcBvLROUeUJ3Lm4aSYA3vVeTNR5bavXWqOKk0QtHv307nNq8/dk0TCPpfggqV3OMjcdU9uyxoaHdqbEJGpQ+vG9neLxAbd3j3v+/mEglmyi+rIVw3gQgBkOQ3B/E2rn+jFvT85VFAzBfLoeledai7EnDu/c3VHU776e9ICDHAiK6PlNAQLNj95V4+LPlYs1popkEfVuyViba/op+c2P/7IvtC7E6qDd1yhcRPy2mmLP1tu7ZU96lx+V6u/effJo1F1XH7zvbktay7QURq2J60ED62YlZHSEMzdsvqqTucuKpF4X9m/dUn2qCsXG3T46IHu6ujCOL+70u17xthnumZIksusubJXfeTB/i1KcmxUGRMpG7JJ+8Z56x7dXDhxbl8/2+y7lbMyeoSjE3O3rL6q0/uLK0wQyN+gJCv4JAav2pdDzojBbbSvBLj7FGCAQvfbvJbV39rmoktK8obX34oLVUgiJERMVnh/waiaqDjzq0rRw6+CE7922hGfKbeJq3rUFer3zWsZXAOu1Nig3Yefmt/85PWvhFH1qgA8QidPX3xBEebGUJUQ/5qMeMW14xpVmCDY6qNL5zWvufzVAHefU/So1vXm1d/tUz07gIGMGPNajF0bNKw0iaDDuf+c17zm8vz+Ve7VGcsrShdxMGRu8xNNfaJv86qbyl5DCYq85IYVJpHo8NE1s1tWf15ptPkwpL7mAYahiNe8zasfaJPwuH7n7qsyiSDfBub3Y3BVIKo0QaIjiq6Z1bz6M8vyLZ7yKhqV8upNSNxEtQzs8fVHfi0QLjYIfeoikP3KX/bx4RdSbqx0+egbs5rXXLIM7N6Uu+73AOdXvSFe+bq+btFJSTFXFRl7RJePiNBR22Mmn+RqlBYTAG7A+4vmtKy5VieB5L5qFL3d6vKSl+bZLWvujcT+XY+Lllqku9LEu6Lka7108gEbH9xXGW+v+2LW69vmtKy5tuDnyiQZ86ShwWVgC1mVdbVHHZi0+kVFP1RkrO32Do9OCuqO7QTVIrFWgKzqTV1i//nQzY+27auk/WsC4PzkyQoabGGSNk0/4mhR83mQs0qMSfZ4T0h8OGBhZ41XkIodQEasTYnQ5/3joepXZresvme4TTHZmGZSGjKxbm6UwoQ1TzviCG/sBaL6D8XW1oSq9KlH0UgQ0X2TjsyfhapekKBYDAahF/cXr1zd0hz84BgeDSeLMbVfATwc6CaQAnW/VPuG+rTJnYXwPgfHlRsroSr96nFDunpwu5zxgF442FbyRfyCBGkxpETo9M4nkOVe5XuPl3bf+a7nn89OZqndbwDemUQXpFrEnurRdzrh9cViSwKBSCHEE6ri8hKYt9RHDUzkF4QNEJIiJEQQoMs7Z4QnjMrdOe/+e86WJ58c7uJNFiv5NQHw9jp6CStHWKnrZx4xy3h7tKr+nUGO8uhBqsxIiKRTIgT5rRJkh6gTRKoMqBKh3R7WGnS1wP1OZdXcltVPDX82NJr9Bdj9EuAdpbrBsB3YALpwYXLTtky9Oj9TjZuOSLV6KgRKhn3vXgzbFFoDNeuDyGyc1vbo5u2fs5yGYAkrvezHUbb9/roUjNJolYZA99K3Vxrt8gn4nCkJ3sdUHn+3RlnBFlkyxr0rgFZW6lOgS2EiDj2cVNf/B8+gsrmqarGmAAAAAElFTkSuQmCC" alt="Mejoramiento de Barrios" width="36" height="34"></span>
     <div>
       <h1>Obras en mi barrio</h1>
-      <p>Dirección de Mejoramiento de Barrios · Inversión pública y personas beneficiadas en Bogotá</p>
+      <p>Dirección de Mejoramiento de Barrios · ¿Cuánto se ha invertido? ¿Cuántas personas se beneficiaron?</p>
     </div>
   </div>
   <div class="top-actions">
@@ -659,6 +769,27 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
       <div class="mini">
         <div><b id="finContratos">—</b><span>contratos</span></div>
         <div><b id="finSectores">—</b><span>sectores</span></div>
+      </div>
+    </section>
+
+    <section class="card exec" id="execCard" aria-labelledby="execTitle">
+      <h2 id="execTitle">Estado de ejecución de las obras</h2>
+      <div class="exec-badges" id="execBadges" aria-live="polite"></div>
+      <p class="exec-cap">Contratos por proyecto</p>
+      <div class="exec-bars loading" id="execBars" role="group" aria-label="Contratos por proyecto"></div>
+      <div class="exec-sel" id="execSel" hidden>
+        <span id="execSelTxt"></span>
+        <span class="acts"><button class="go" id="execGo" type="button">Ver en el mapa</button><button class="no" id="execNo" type="button">Quitar</button></span>
+      </div>
+      <button class="exec-toggle" id="execToggle" type="button" aria-expanded="false" aria-controls="execCollapse">
+        <span id="execToggleTxt">Ver detalle por proyecto</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="exec-collapse" id="execCollapse">
+        <div class="in">
+          <div class="exec-table" id="execTable" role="list"></div>
+          <p class="foot">Los m² son la meta física de cada proyecto, contada una sola vez; si el contrato no la informa aparece un guion. El tipo de proyecto (movilidad, espacio público, integral) se asigna según la clase de proyecto.</p>
+        </div>
       </div>
     </section>
 
@@ -732,7 +863,7 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
           <circle class="r3" cx="60" cy="60" r="54"/><circle class="r2" cx="60" cy="60" r="38"/>
           <circle class="r1" cx="60" cy="60" r="22"/><circle class="dot" cx="60" cy="60" r="8"/>
         </svg>
-        <h2>¿A cuántas personas llega cada obra?</h2>
+        <h2>¿A cuántas personas llega cada intervencion?</h2>
         <p>Haz clic en una obra del mapa y descubre cuántas personas viven a 300 metros o menos de ella.</p>
         <button class="btn btn-primary" id="btnDemo" type="button">Probar con una obra</button>
       </div>
@@ -821,6 +952,7 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
     <p>Al hacer clic en una obra se dibuja un área de 300 metros a su alrededor. Se buscan las manzanas del censo que tocan esa área y se suman sus habitantes, viviendas y hogares.</p>
     <h3>Para leer bien las cifras</h3>
     <p>Un mismo contrato puede atender varios sectores. En la gráfica por sector aparece completo en cada uno, pero la inversión total lo cuenta una sola vez.</p>
+    <p>En «Estado de ejecución de las obras» los contratos se agrupan por proyecto y por su estado contractual (en ejecución o en liquidación). Los m² son la meta física de cada proyecto, contada una sola vez.</p>
     <div class="modal-actions"><button class="btn btn-primary" id="aboutClose" type="button">Entendido</button></div>
   </div>
 </div>
@@ -947,7 +1079,10 @@ const state = {
   hoverCode: null,
   layers: {},
   impact: { buffer: null, bufferGeo: null, mz: null, tag: null, pulse: null },
-  geoMarker: null
+  geoMarker: null,
+  exec: null,
+  execSel: null,
+  execHL: null
 };
 
 /* ==========================================================================
@@ -1955,11 +2090,17 @@ function initBuscador(map) {
 /* ---------- Sectores catastrales ---------- */
 function estiloSector(f) {
   const s = state.fin && state.fin.byCode.get(f.properties.cod);
+  let st;
   if (s) {
     const t = Math.sqrt(s.valor / (state.fin.maxSector || 1));
-    return { color: COLORS.deep, weight: 1.8, opacity: 0.95, dashArray: null, fillColor: mixColor('#8FAEFF', '#1B3FD8', t), fillOpacity: 0.5 + 0.32 * t };
+    st = { color: COLORS.deep, weight: 1.8, opacity: 0.95, dashArray: null, fillColor: mixColor('#8FAEFF', '#1B3FD8', t), fillOpacity: 0.5 + 0.32 * t };
+  } else {
+    st = { color: COLORS.cobalt, weight: 1.3, opacity: 0.85, dashArray: null, fillColor: COLORS.cobalt, fillOpacity: 0.2 };
   }
-  return { color: COLORS.cobalt, weight: 1.3, opacity: 0.85, dashArray: null, fillColor: COLORS.cobalt, fillOpacity: 0.2 };
+  if (state.execHL && state.execHL.has(f.properties.cod)) {
+    st.color = COLORS.work; st.weight = 3.4; st.opacity = 1; st.fillOpacity = Math.max(st.fillOpacity, 0.62);
+  }
+  return st;
 }
 
 function tooltipSector(p) {
@@ -2704,6 +2845,286 @@ function initEventosUI() {
 }
 
 /* ==========================================================================
+   5b. ESTADO DE EJECUCIÓN DE LAS OBRAS
+   Agrupa los contratos por proyecto (columna TIPO PROYECTO) y por estado contractual.
+   ========================================================================== */
+const CATEGORIA_PROYECTO = {
+  INFRAESTRUCTURADETRANSPORTE: 'Movilidad',
+  MEJORAMIENTODEPARQUES: 'Espacio público',
+  ECOBARRIOS: 'Integral',
+  MIXTOCIVYPARQUES: 'Integral'
+};
+
+const ESTADOS_CONTRATO = {
+  ejecucion: { cls: 'eje', corto: 'ejecución', largo: 'en ejecución' },
+  liquidado: { cls: 'liq', corto: 'liquidación', largo: 'en liquidación' },
+  otro:      { cls: 'otr', corto: 'otro estado', largo: 'en otro estado' }
+};
+
+function nombreProyecto(raw) {
+  const s = String(raw || '').trim().toLowerCase();
+  if (!s) return 'Sin clasificar';
+  return (s.charAt(0).toUpperCase() + s.slice(1)).replace(/\bciv\b/g, 'CIV');
+}
+
+function procesarEjecucion(rows) {
+  const K = mapaColumnas(rows[0] || {});
+  const get = (r, n) => (K[n] !== undefined ? r[K[n]] : undefined);
+  const contratos = new Map();
+
+  rows.forEach((r, idx) => {
+    const num = String(get(r, 'NOCONTRATO') == null ? '' : get(r, 'NOCONTRATO')).trim();
+    const key = num || ('fila-' + idx);
+    const code = normSca(get(r, 'SCACODIGO'));
+    let c = contratos.get(key);
+    if (!c) {
+      const clase = String(get(r, 'TIPOPROYECTO') || '').trim();
+      c = {
+        num: num,
+        valor: parseMoney(get(r, 'VALORTOTALCONTRATO')),
+        tipo: tipoContrato(get(r, 'TIPODECONTRATO')),
+        estado: estadoContrato(get(r, 'ESTADO')),
+        clase: clase,
+        claseKey: normHeader(clase) || 'SINCLASIFICAR',
+        proy: String(get(r, 'PROYECTO') || '').trim(),
+        m2: parseMoney(get(r, 'METAFISICAM2')),
+        sectores: new Set()
+      };
+      contratos.set(key, c);
+    }
+    if (code) c.sectores.add(code);
+  });
+
+  const grupos = new Map();
+  contratos.forEach(c => {
+    let g = grupos.get(c.claseKey);
+    if (!g) {
+      g = {
+        key: c.claseKey,
+        nombre: nombreProyecto(c.clase),
+        categoria: CATEGORIA_PROYECTO[c.claseKey] || '—',
+        n: 0, ejec: 0, liq: 0, otro: 0, valor: 0,
+        sectores: new Set(), contratos: [], m2Proy: new Map(), m2: 0
+      };
+      grupos.set(c.claseKey, g);
+    }
+    g.n++;
+    if (c.estado === 'ejecucion') g.ejec++;
+    else if (c.estado === 'liquidado') g.liq++;
+    else g.otro++;
+    g.valor += c.valor;
+    c.sectores.forEach(s => g.sectores.add(s));
+    g.contratos.push(c);
+    const pk = c.proy || ('contrato-' + c.num);
+    g.m2Proy.set(pk, Math.max(g.m2Proy.get(pk) || 0, c.m2 || 0));
+  });
+
+  const orden = { ejecucion: 0, liquidado: 1, otro: 2 };
+  const lista = Array.from(grupos.values()).map(g => {
+    g.m2 = 0;
+    g.m2Proy.forEach(v => { g.m2 += v; });
+    g.contratos.sort((a, b) => (orden[a.estado] - orden[b.estado]) || (b.valor - a.valor));
+    return g;
+  }).sort((a, b) => (b.n - a.n) || (b.valor - a.valor));
+
+  const tot = { n: 0, ejec: 0, liq: 0, otro: 0, valor: 0, m2: 0 };
+  lista.forEach(g => {
+    tot.n += g.n; tot.ejec += g.ejec; tot.liq += g.liq; tot.otro += g.otro;
+    tot.valor += g.valor; tot.m2 += g.m2;
+  });
+
+  return {
+    grupos: lista,
+    tot: tot,
+    max: lista.length ? lista[0].n : 1,
+    byKey: new Map(lista.map(g => [g.key, g]))
+  };
+}
+
+function textoEstados(g) {
+  const p = [];
+  if (g.ejec) p.push(nf0.format(g.ejec) + ' ' + ESTADOS_CONTRATO.ejecucion.largo);
+  if (g.liq) p.push(nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.largo);
+  if (g.otro) p.push(nf0.format(g.otro) + ' ' + ESTADOS_CONTRATO.otro.largo);
+  return p.join(', ');
+}
+
+function fmtM2(v) { return v > 0 ? nf0.format(Math.round(v)) : '—'; }
+
+function estadosHTML(g) {
+  let h = '';
+  if (g.ejec) h += '<span class="st"><i class="dot eje"></i>' + nf0.format(g.ejec) + ' ' + ESTADOS_CONTRATO.ejecucion.corto + '</span>';
+  if (g.liq) h += '<span class="st"><i class="dot liq"></i>' + nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.corto + '</span>';
+  if (g.otro) h += '<span class="st"><i class="dot"></i>' + nf0.format(g.otro) + ' ' + ESTADOS_CONTRATO.otro.corto + '</span>';
+  return h;
+}
+
+function renderEjecucion() {
+  const E = state.exec;
+  if (!E) return;
+  const t = E.tot;
+
+  const badges = [];
+  if (t.ejec) badges.push('<span class="exec-badge"><i class="dot eje"></i><b>' + nf0.format(t.ejec) + '</b> en ejecución</span>');
+  if (t.liq) badges.push('<span class="exec-badge"><i class="dot liq"></i><b>' + nf0.format(t.liq) + '</b> en liquidación</span>');
+  if (t.otro) badges.push('<span class="exec-badge"><i class="dot"></i><b>' + nf0.format(t.otro) + '</b> otros</span>');
+  $('#execBadges').innerHTML = badges.join('');
+
+  const bars = $('#execBars');
+  bars.classList.remove('loading');
+  bars.innerHTML = E.grupos.map(g => {
+    const pct = g.n / (E.max || 1) * 100;
+    const segs =
+      (g.liq ? '<i class="liq" style="flex:' + g.liq + '"></i>' : '') +
+      (g.ejec ? '<i class="eje" style="flex:' + g.ejec + '"></i>' : '') +
+      (g.otro ? '<i class="otr" style="flex:' + g.otro + '"></i>' : '');
+    const tip = nf0.format(g.n) + (g.n === 1 ? ' contrato: ' : ' contratos: ') + textoEstados(g) +
+      '\n' + copFmt.format(Math.round(g.valor)) + '\nToca para ver el detalle';
+    return '<button type="button" class="exec-bar" data-k="' + esc(g.key) + '" aria-pressed="false" data-tip="' + esc(tip) + '">' +
+      '<span class="l1"><span>' + esc(g.nombre) + '</span><b>' + nf0.format(g.n) + '</b></span>' +
+      '<span class="exec-track"><span class="exec-fill" data-w="' + pct + '">' + segs + '</span></span></button>';
+  }).join('');
+  void bars.offsetWidth;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $$('.exec-fill', bars).forEach(el => { el.style.width = el.dataset.w + '%'; });
+  }));
+
+  const filas = E.grupos.map(g => {
+    const items = g.contratos.map(c => {
+      const e = ESTADOS_CONTRATO[c.estado] || ESTADOS_CONTRATO.otro;
+      return '<li title="Contrato ' + esc(c.num || 's/n') + ': ' + esc(c.tipo) + ' ' + esc(e.largo) + '"><span class="nc">' + esc(c.num || 's/n') + '</span>' +
+        '<span class="tc"><b>' + esc(c.tipo) + '</b><i class="dot ' + (e.cls === 'otr' ? '' : e.cls) + '"></i><span class="est">' + esc(e.corto) + '</span></span>' +
+        '<span class="vc" title="' + esc(copFmt.format(Math.round(c.valor))) + '">' + compactCOP(c.valor) + '</span></li>';
+    }).join('');
+    return '<div class="xrow" role="listitem" data-k="' + esc(g.key) + '">' +
+      '<button type="button" class="xbtn" aria-expanded="false">' +
+        '<span class="x-ex" aria-hidden="true">+</span>' +
+        '<span class="x-nm">' + esc(g.nombre) + '</span>' +
+        '<span class="x-val" title="' + esc(copFmt.format(Math.round(g.valor))) + '">' + compactCOP(g.valor) + '</span>' +
+        '<span class="x-meta">' +
+          '<span class="tipo">' + esc(g.categoria) + '</span>' +
+          '<span class="estados">' + estadosHTML(g) + '</span>' +
+          '<span class="n"><b>' + nf0.format(g.n) + '</b><span class="u">' + (g.n === 1 ? ' contrato' : ' contratos') + '</span></span>' +
+          '<span class="m2"><b>' + fmtM2(g.m2) + '</b><span class="u"> m²</span></span>' +
+        '</span>' +
+      '</button>' +
+      '<ul class="x-list" hidden>' + items + '</ul>' +
+    '</div>';
+  }).join('');
+
+  const cab =
+    '<div class="x-th" aria-hidden="true"><span></span><span class="c1">Proyecto</span><span class="c2">Tipo proyecto</span>' +
+    '<span class="c3">Estado contractual</span><span class="c4 r">Contratos</span><span class="c5 r">M² intervenidos</span>' +
+    '<span class="c6 r">Valor total</span></div>';
+  const total =
+    '<div class="xtot"><b>Total</b>' +
+    '<span><b>' + nf0.format(t.n) + '</b> ' + (t.n === 1 ? 'contrato' : 'contratos') + '</span>' +
+    '<span><b>' + fmtM2(t.m2) + '</b> m²</span>' +
+    '<b class="tv" title="' + esc(copFmt.format(Math.round(t.valor))) + '">' + compactCOP(t.valor) + '</b></div>';
+
+  $('#execTable').innerHTML = cab + filas + total;
+  pintarSeleccionEjecucion();
+}
+
+function sectoresEnMapa(g) {
+  return Array.from(g.sectores).filter(c => state.sectorLayers.has(c));
+}
+
+function pintarSeleccionEjecucion() {
+  const card = $('#execCard');
+  if (!card) return;
+  const k = state.execSel;
+  if (k) card.setAttribute('data-sel', ''); else card.removeAttribute('data-sel');
+  $$('.exec-bar', card).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+  $$('.xrow', card).forEach(r => {
+    const on = r.dataset.k === k;
+    r.classList.toggle('sel', on);
+    $('.xbtn', r).setAttribute('aria-expanded', String(on));
+    $('.x-ex', r).textContent = on ? '−' : '+';
+    $('.x-list', r).hidden = !on;
+  });
+  const g = (k && state.exec) ? state.exec.byKey.get(k) : null;
+  const strip = $('#execSel');
+  strip.hidden = !g;
+  if (g) {
+    const n = sectoresEnMapa(g).length;
+    $('#execSelTxt').innerHTML = '<b>' + nf0.format(n) + '</b>' + (n === 1 ? ' sector resaltado' : ' sectores resaltados') + ' en el mapa';
+  }
+}
+
+function abrirEjecucion(abrir) {
+  const col = $('#execCollapse');
+  if (!col) return;
+  col.classList.toggle('open', abrir);
+  $('#execToggle').setAttribute('aria-expanded', String(abrir));
+  $('#execToggleTxt').textContent = abrir ? 'Ocultar detalle' : 'Ver detalle por proyecto';
+  const inner = $('.in', col);
+  if (inner) inner.inert = !abrir;
+}
+
+function seleccionarProyecto(key, opts) {
+  const E = state.exec;
+  if (!E) return;
+  state.execSel = (key == null || state.execSel === key) ? null : key;
+  const g = state.execSel ? E.byKey.get(state.execSel) : null;
+  state.execHL = g ? g.sectores : null;
+  pintarSeleccionEjecucion();
+  restilarSectores();
+  if (!g) return;
+  sectoresEnMapa(g).forEach(c => { const l = state.sectorLayers.get(c); if (l) l.bringToFront(); });
+  if (!(opts && opts.desdeTabla)) {
+    abrirEjecucion(true);
+    setTimeout(() => {
+      const row = $('#execCard .xrow.sel');
+      if (row) row.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+    }, 380);
+  }
+}
+
+function verProyectoEnMapa() {
+  const g = state.execSel && state.exec ? state.exec.byKey.get(state.execSel) : null;
+  if (!g) return;
+  let b = null;
+  sectoresEnMapa(g).forEach(c => {
+    const lb = state.sectorLayers.get(c).getBounds();
+    if (!b) b = L.latLngBounds(lb.getSouthWest(), lb.getNorthEast());
+    else b.extend(lb);
+  });
+  if (!b) { toast('Los sectores de estos contratos no tienen polígono en el mapa.'); return; }
+  setView('mapa');
+  state.map.flyToBounds(b, { padding: [40, 40], maxZoom: 15, animate: !reduceMotion, duration: 1.1 });
+}
+
+function iniciarEjecucion(rows) {
+  try {
+    state.exec = procesarEjecucion(rows);
+    renderEjecucion();
+  } catch (err) {
+    console.error('Ejecución:', err);
+    const b = $('#execBars');
+    if (b) { b.classList.remove('loading'); b.innerHTML = '<p class="foot" style="padding:8px 0">No se pudo armar el estado de ejecución.</p>'; }
+  }
+}
+
+function initEjecucionUI() {
+  const card = $('#execCard');
+  if (!card) return;
+  abrirEjecucion(false);
+  $('#execToggle').addEventListener('click', () => abrirEjecucion(!$('#execCollapse').classList.contains('open')));
+  card.addEventListener('click', e => {
+    const bar = e.target.closest('.exec-bar');
+    if (bar) { seleccionarProyecto(bar.dataset.k); return; }
+    const btn = e.target.closest('.xbtn');
+    if (btn) seleccionarProyecto(btn.closest('.xrow').dataset.k, { desdeTabla: true });
+  });
+  $('#execGo').addEventListener('click', verProyectoEnMapa);
+  $('#execNo').addEventListener('click', () => seleccionarProyecto(null));
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && state.execSel) { e.stopPropagation(); seleccionarProyecto(null); }
+  });
+}
+
+/* ==========================================================================
    11. ARRANQUE
    ========================================================================== */
 async function boot() {
@@ -2719,6 +3140,7 @@ async function boot() {
   try {
     leerDatosEmbebidos();
     initEventosUI();
+    initEjecucionUI();
     initMapa();
     initDonut();
     poblarSelectorObras();
@@ -2733,6 +3155,7 @@ async function boot() {
     const rows = await csvPromise;
     state.fin = procesarContratos(rows);
     renderFinanzas();
+    iniciarEjecucion(rows);
     restilarSectores();
     if (state.selK != null) mostrarFichaObra(state.obraByK.get(state.selK));
     Loader.set('csv', 'done', nf0.format(state.fin.nContratos) + ' contratos en ' + nf0.format(state.fin.sectores.length) + ' sectores', 1);
@@ -2741,6 +3164,8 @@ async function boot() {
     const local = location.protocol === 'file:';
     $('#finWords').textContent = 'No se pudieron leer los contratos';
     $('#finNote').textContent = 'Los contratos incluidos en la página no se pudieron procesar.';
+    const eb = $('#execBars');
+    if (eb) { eb.classList.remove('loading'); eb.innerHTML = '<p class="foot" style="padding:8px 0">Sin datos de contratos.</p>'; }
     $('#topBox').classList.remove('loading');
     $('#topBox').innerHTML = '<p class="foot" style="padding:24px 6px;text-align:center">No hay datos de inversión para mostrar.</p>';
     Loader.set('csv', 'error', 'No se pudieron leer los contratos', 1);

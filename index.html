@@ -597,9 +597,25 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
 .exec .dot{display:inline-block;flex:none;width:7px;height:7px;border-radius:50%;background:#9AA7C7;box-shadow:none;margin:0}
 .exec .dot.eje{background:var(--work)}
 .exec .dot.liq{background:var(--cobalt)}
-.exec-badges{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;min-height:22px}
-.exec-badge{display:inline-flex;align-items:center;gap:6px;padding:2px 9px 2px 7px;border-radius:999px;font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--line-2);white-space:nowrap}
-.exec-badge b{color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+.exec-chart{display:flex;align-items:center;gap:16px;margin-top:10px;min-height:96px}
+.exec-donut{position:relative;flex:none;width:96px;height:96px}
+.exec-donut svg{display:block;width:100%;height:100%;transform:rotate(-90deg)}
+.exec-donut circle{fill:none;stroke-width:4.2}
+.exec-donut .trk{stroke:var(--line-2)}
+.exec-donut .seg{transition:stroke-dasharray .9s cubic-bezier(.16,1,.3,1)}
+.exec-donut .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;text-align:center}
+.exec-donut .mid b{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.exec-donut .mid span{margin-top:2px;font-size:10.5px;font-weight:600;color:var(--ink-3)}
+.exec-legend{flex:1;min-width:0;display:grid;gap:7px;margin:0;padding:0;list-style:none}
+.exec-legend li{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink-2);line-height:1.25}
+.exec-legend .dot{width:9px;height:9px}
+.exec-legend .pc{margin-left:auto;font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.exec-legend .n{font-weight:500;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.exec-bar .l1 b .pc{margin-left:6px;font-weight:600;color:var(--ink-3)}
+.exec-contr{margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2);display:grid;gap:6px}
+.exec-contr .it{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:10px;background:#F4F0FF;font-size:12.5px;color:var(--ink-2);line-height:1.3}
+.exec-contr .it b{color:var(--ink);font-weight:800}
+.exec-contr .dot.con{background:var(--violet)}
 .exec-cap{margin:10px 0 2px;font-size:11.5px;font-weight:600;color:var(--ink-3)}
 .exec-bars{display:grid;gap:2px}
 .exec-bars.loading{height:118px;border-radius:10px;background:linear-gradient(100deg,#EEF2FA 30%,#F8FAFE 50%,#EEF2FA 70%);background-size:220% 100%;animation:shimmer 1.4s linear infinite}
@@ -616,6 +632,7 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
 .exec-fill .liq{background:var(--cobalt)}
 .exec-fill .eje{background:var(--work)}
 .exec-fill .otr{background:#9AA7C7}
+@media (prefers-reduced-motion:reduce){.exec-donut .seg{transition:none}}
 .exec-bar[data-tip]::after{
   content:attr(data-tip);position:absolute;left:8px;bottom:calc(100% - 2px);z-index:6;
   width:max-content;max-width:min(250px,calc(100% - 16px));padding:8px 11px;border-radius:10px;
@@ -774,9 +791,13 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
 
     <section class="card exec" id="execCard" aria-labelledby="execTitle">
       <h2 id="execTitle">Estado de ejecución de las obras</h2>
-      <div class="exec-badges" id="execBadges" aria-live="polite"></div>
+      <div class="exec-chart" id="execChart" aria-live="polite"></div>
       <p class="exec-cap">Contratos por proyecto</p>
       <div class="exec-bars loading" id="execBars" role="group" aria-label="Contratos por proyecto"></div>
+      <div class="exec-contr" id="execContr" aria-label="Proyectos en contratación">
+        <p class="it"><i class="dot con"></i><span><b>Proyecto Suba V</b> en estado de contratación</span></p>
+        <p class="it"><i class="dot con"></i><span><b>Proyecto Bosa</b> en estado de contratación</span></p>
+      </div>
       <div class="exec-sel" id="execSel" hidden>
         <span id="execSelTxt"></span>
         <span class="acts"><button class="go" id="execGo" type="button">Ver en el mapa</button><button class="no" id="execNo" type="button">Quitar</button></span>
@@ -952,7 +973,7 @@ body.intro .obra-halo{animation:haloPulse 1.7s ease-out 3}
     <p>Al hacer clic en una obra se dibuja un área de 300 metros a su alrededor. Se buscan las manzanas del censo que tocan esa área y se suman sus habitantes, viviendas y hogares.</p>
     <h3>Para leer bien las cifras</h3>
     <p>Un mismo contrato puede atender varios sectores. En la gráfica por sector aparece completo en cada uno, pero la inversión total lo cuenta una sola vez.</p>
-    <p>En «Estado de ejecución de las obras» los contratos se agrupan por proyecto y por su estado contractual (en ejecución o en liquidación). Los m² son la meta física de cada proyecto, contada una sola vez.</p>
+    <p>En «Estado de ejecución de las obras» los contratos se agrupan por proyecto y por su estado contractual (en ejecución o terminado). Los m² son la meta física de cada proyecto, contada una sola vez.</p>
     <div class="modal-actions"><button class="btn btn-primary" id="aboutClose" type="button">Entendido</button></div>
   </div>
 </div>
@@ -2855,9 +2876,14 @@ const CATEGORIA_PROYECTO = {
   MIXTOCIVYPARQUES: 'Integral'
 };
 
+const NOMBRE_PROYECTO = {
+  INFRAESTRUCTURADETRANSPORTE: 'Malla Vial',
+  MIXTOCIVYPARQUES: 'Mixto - Segmentos Viales y Parques'
+};
+
 const ESTADOS_CONTRATO = {
   ejecucion: { cls: 'eje', corto: 'ejecución', largo: 'en ejecución' },
-  liquidado: { cls: 'liq', corto: 'liquidación', largo: 'en liquidación' },
+  liquidado: { cls: 'liq', corto: 'terminado', largo: 'terminado' },
   otro:      { cls: 'otr', corto: 'otro estado', largo: 'en otro estado' }
 };
 
@@ -2901,7 +2927,7 @@ function procesarEjecucion(rows) {
     if (!g) {
       g = {
         key: c.claseKey,
-        nombre: nombreProyecto(c.clase),
+        nombre: NOMBRE_PROYECTO[c.claseKey] || nombreProyecto(c.clase),
         categoria: CATEGORIA_PROYECTO[c.claseKey] || '—',
         n: 0, ejec: 0, liq: 0, otro: 0, valor: 0,
         sectores: new Set(), contratos: [], m2Proy: new Map(), m2: 0
@@ -2944,7 +2970,7 @@ function procesarEjecucion(rows) {
 function textoEstados(g) {
   const p = [];
   if (g.ejec) p.push(nf0.format(g.ejec) + ' ' + ESTADOS_CONTRATO.ejecucion.largo);
-  if (g.liq) p.push(nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.largo);
+  if (g.liq) p.push(nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.largo + (g.liq === 1 ? '' : 's'));
   if (g.otro) p.push(nf0.format(g.otro) + ' ' + ESTADOS_CONTRATO.otro.largo);
   return p.join(', ');
 }
@@ -2954,7 +2980,7 @@ function fmtM2(v) { return v > 0 ? nf0.format(Math.round(v)) : '—'; }
 function estadosHTML(g) {
   let h = '';
   if (g.ejec) h += '<span class="st"><i class="dot eje"></i>' + nf0.format(g.ejec) + ' ' + ESTADOS_CONTRATO.ejecucion.corto + '</span>';
-  if (g.liq) h += '<span class="st"><i class="dot liq"></i>' + nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.corto + '</span>';
+  if (g.liq) h += '<span class="st"><i class="dot liq"></i>' + nf0.format(g.liq) + ' ' + ESTADOS_CONTRATO.liquidado.corto + (g.liq === 1 ? '' : 's') + '</span>';
   if (g.otro) h += '<span class="st"><i class="dot"></i>' + nf0.format(g.otro) + ' ' + ESTADOS_CONTRATO.otro.corto + '</span>';
   return h;
 }
@@ -2964,11 +2990,41 @@ function renderEjecucion() {
   if (!E) return;
   const t = E.tot;
 
-  const badges = [];
-  if (t.ejec) badges.push('<span class="exec-badge"><i class="dot eje"></i><b>' + nf0.format(t.ejec) + '</b> en ejecución</span>');
-  if (t.liq) badges.push('<span class="exec-badge"><i class="dot liq"></i><b>' + nf0.format(t.liq) + '</b> en liquidación</span>');
-  if (t.otro) badges.push('<span class="exec-badge"><i class="dot"></i><b>' + nf0.format(t.otro) + '</b> otros</span>');
-  $('#execBadges').innerHTML = badges.join('');
+  // Porcentaje de contratos por estado (se reparte con el método del mayor resto para que sumen 100 %)
+  const partes = [
+    { label: 'En ejecución',   cls: 'eje', color: 'var(--work)',   n: t.ejec },
+    { label: 'Terminado', cls: 'liq', color: 'var(--cobalt)', n: t.liq },
+    { label: 'Otros estados',  cls: '',    color: '#9AA7C7',       n: t.otro }
+  ].filter(x => x.n > 0);
+  if (t.n) {
+    partes.forEach(x => { x.raw = x.n / t.n * 100; x.pct = Math.floor(x.raw); });
+    let falta = 100 - partes.reduce((a, x) => a + x.pct, 0);
+    partes.slice().sort((a, b) => (b.raw - b.pct) - (a.raw - a.pct)).forEach(x => { if (falta > 0) { x.pct++; falta--; } });
+  }
+  const chart = $('#execChart');
+  if (chart && t.n) {
+    let acc = 0;
+    const solo = partes.length === 1;
+    const arcos = partes.map(x => {
+      const len = x.raw, ini = acc; acc += len;
+      return '<circle class="seg" cx="18" cy="18" r="15.9155" stroke="' + x.color + '" data-len="' + Math.max(len - (solo ? 0 : 0.7), 0.3).toFixed(2) + '" stroke-dasharray="0 100" stroke-dashoffset="' + (-ini).toFixed(2) + '"/>';
+    }).join('');
+    const resumen = partes.map(x => x.pct + ' % ' + x.label.toLowerCase()).join(', ');
+    chart.innerHTML =
+      '<div class="exec-donut" role="img" aria-label="Contratos por estado: ' + esc(resumen) + '">' +
+        '<svg viewBox="0 0 36 36" aria-hidden="true"><circle class="trk" cx="18" cy="18" r="15.9155"/>' + arcos + '</svg>' +
+        '<div class="mid"><b>' + nf0.format(t.n) + '</b><span>' + (t.n === 1 ? 'contrato' : 'contratos') + '</span></div>' +
+      '</div>' +
+      '<ul class="exec-legend">' + partes.map(x =>
+        '<li><i class="dot ' + x.cls + '"></i><span>' + x.label + ' <span class="n">(' + nf0.format(x.n) + ')</span></span><span class="pc">' + x.pct + '%</span></li>'
+      ).join('') + '</ul>';
+    void chart.offsetWidth;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      $$('.exec-donut .seg', chart).forEach(c => { c.setAttribute('stroke-dasharray', c.dataset.len + ' ' + (100 - c.dataset.len)); });
+    }));
+  } else if (chart) {
+    chart.innerHTML = '';
+  }
 
   const bars = $('#execBars');
   bars.classList.remove('loading');
@@ -2978,10 +3034,10 @@ function renderEjecucion() {
       (g.liq ? '<i class="liq" style="flex:' + g.liq + '"></i>' : '') +
       (g.ejec ? '<i class="eje" style="flex:' + g.ejec + '"></i>' : '') +
       (g.otro ? '<i class="otr" style="flex:' + g.otro + '"></i>' : '');
-    const tip = nf0.format(g.n) + (g.n === 1 ? ' contrato: ' : ' contratos: ') + textoEstados(g) +
+    const tip = nf0.format(g.n) + (g.n === 1 ? ' contrato' : ' contratos') + ' (' + (t.n ? Math.round(g.n / t.n * 100) : 0) + '% del total): ' + textoEstados(g) +
       '\n' + copFmt.format(Math.round(g.valor)) + '\nToca para ver el detalle';
     return '<button type="button" class="exec-bar" data-k="' + esc(g.key) + '" aria-pressed="false" data-tip="' + esc(tip) + '">' +
-      '<span class="l1"><span>' + esc(g.nombre) + '</span><b>' + nf0.format(g.n) + '</b></span>' +
+      '<span class="l1"><span>' + esc(g.nombre) + '</span><b>' + nf0.format(g.n) + '<span class="pc">' + (t.n ? Math.round(g.n / t.n * 100) : 0) + '%</span></b></span>' +
       '<span class="exec-track"><span class="exec-fill" data-w="' + pct + '">' + segs + '</span></span></button>';
   }).join('');
   void bars.offsetWidth;
